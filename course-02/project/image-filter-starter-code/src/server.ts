@@ -1,6 +1,7 @@
-import express from 'express';
+import express, { Request, Response } from 'express';
 import bodyParser from 'body-parser';
 import {filterImageFromURL, deleteLocalFiles} from './util/util';
+import { filter } from 'bluebird';
 
 (async () => {
 
@@ -30,6 +31,24 @@ import {filterImageFromURL, deleteLocalFiles} from './util/util';
   /**************************************************************************** */
 
   //! END @TODO1
+  app.get("/filteredimage/", (req, res, next) => {
+    const authorisation = req.headers.authorization.split(" ");
+    const token = authorisation[1];
+    if (!token) { return res.status(401).send("Not authorized").end() };
+    next();
+  }, async ( req: Request, res: Response ) => {
+    const { image_url } = req.query;
+    if (!image_url || image_url === "") {
+      return res.status(400).send("URL Invalid");
+    }
+    const filterImage = await filterImageFromURL(image_url);
+    if (!filterImage) {
+      return res.status(400).send("Unable To Filter!");
+    }
+    res.status(200).sendFile(filterImage);
+    deleteLocalFiles([filterImage]);
+
+  });
   
   // Root Endpoint
   // Displays a simple message to the user
