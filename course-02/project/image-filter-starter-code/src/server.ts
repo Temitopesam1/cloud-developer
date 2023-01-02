@@ -31,23 +31,19 @@ import { filter } from 'bluebird';
   /**************************************************************************** */
 
   //! END @TODO1
-  app.get("/filteredimage/", (req, res, next) => {
-    const authorisation = req.headers.authorization.split(" ");
-    const token = authorisation[1];
-    if (!token) { return res.status(401).send("Not authorized").end() };
-    next();
-  }, async ( req: Request, res: Response ) => {
+  app.get("/filteredimage/", async ( req: Request, res: Response ) => {
     const { image_url } = req.query;
     if (!image_url || image_url === "") {
       return res.status(400).send("URL Invalid");
     }
-    const filterImage = await filterImageFromURL(image_url);
-    if (!filterImage) {
-      return res.status(400).send("Unable To Filter!");
+    try {
+      const filterImage = await filterImageFromURL(image_url);
+      res.status(200).sendFile(filterImage);
+      deleteLocalFiles([filterImage]);
     }
-    res.status(200).sendFile(filterImage);
-    deleteLocalFiles([filterImage]);
-
+    catch (error) {
+      return res.status(400).send(error);
+    };
   });
   
   // Root Endpoint
@@ -63,3 +59,10 @@ import { filter } from 'bluebird';
       console.log( `press CTRL+C to stop server` );
   } );
 })();
+
+// (req, res, next) => {
+//   const authorisation = req.headers.authorization.split(" ");
+//   const token = authorisation[1];
+//   if (!token) { return res.status(401).send("Not authorized").end() };
+//   next();
+// },

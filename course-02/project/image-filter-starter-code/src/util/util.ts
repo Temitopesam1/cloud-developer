@@ -15,7 +15,7 @@ export async function filterImageFromURL(inputURL: any): Promise<string> {
       const photo = await Jimp.read(inputURL);
       const outpath =
         "/tmp/filtered." + Math.floor(Math.random() * 2000) + ".jpg";
-      await photo
+      photo
         .resize(256, 256) // resize
         .quality(60) // set JPEG quality
         .greyscale() // set greyscale
@@ -27,6 +27,7 @@ export async function filterImageFromURL(inputURL: any): Promise<string> {
     }
   });
 }
+
 
 // deleteLocalFiles
 // helper function to delete files on the local disk
