@@ -39,10 +39,10 @@ import { filter } from 'bluebird';
     try {
       const filterImage = await filterImageFromURL(image_url);
       res.status(200).sendFile(filterImage);
-      deleteLocalFiles([filterImage]);
+      res.on("finish", () => {deleteLocalFiles([filterImage])});
     }
     catch (error) {
-      return res.status(400).send(error);
+      return res.status(422).send("Could not process URL");
     };
   });
   
