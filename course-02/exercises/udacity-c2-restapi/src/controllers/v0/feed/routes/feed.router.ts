@@ -64,8 +64,8 @@ router.get('/signed-url/:fileName',
 router.post('/', 
     requireAuth, 
     async (req: Request, res: Response) => {
-    const caption = req.body.caption;
-    const fileName = req.body.url;
+    const caption = req.body.caption; // thank God it's friday
+    const fileName = req.body.url; // test.png
 
     // check Caption is valid
     if (!caption) {
