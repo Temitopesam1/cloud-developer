@@ -32,12 +32,12 @@ import { filter } from 'bluebird';
 
   //! END @TODO1
   app.get("/filteredimage/", async ( req: Request, res: Response ) => {
-    const { image_url } = req.query;
+    const image_url: any = req.query.image_url;
     if (!image_url || image_url === "") {
       return res.status(400).send("URL Invalid");
     }
     try {
-      const filterImage = await filterImageFromURL(image_url);
+      const filterImage: string = await filterImageFromURL(image_url);
       res.status(200).sendFile(filterImage);
       res.on("finish", () => {deleteLocalFiles([filterImage])});
     }
@@ -48,7 +48,7 @@ import { filter } from 'bluebird';
   
   // Root Endpoint
   // Displays a simple message to the user
-  app.get( "/", async ( req, res ) => {
+  app.get( "/", async ( req: Request, res: Response ) => {
     res.send("try GET /filteredimage?image_url={{}}")
   } );
   
