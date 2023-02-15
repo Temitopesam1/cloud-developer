@@ -7,6 +7,7 @@ plugins:
   - serverless-webpack
   - serverless-iam-roles-per-function
   - serverless-reqvalidator-plugin
+  - serverless-plugin-tracing
   - serverless-aws-documentation
 
 provider:
@@ -14,16 +15,21 @@ provider:
   runtime: nodejs12.x
   stage: ${opt:stage, 'dev'}
   region: ${opt:region, 'us-east-1'}
-  
-#  X-Ray Tracing
-  tracing: 
-    lambda: true
-    apiGateway: true
+  tracing: true
 
   environment:
     PROJECT_NAME: udacity
     TODOS_TABLE: serverless-todo-images-4-${self:provider.stage}
     S3_BUCKET_NAME: serverless-todo-images-4-${self:provider.stage}
+	
+  iam:
+    role:
+      statements:
+        - Effect: Allow
+          Action:
+            - xray:PutTelemetryRecords
+            - xray:PutTraceSegments
+          Resource: "*"
 
 custom:
   documentation:
@@ -82,11 +88,11 @@ functions:
         Action:
           - dynamodb:Query
         Resource: arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.TODOS_TABLE}
-      - Effect: Allow
-        Action:
-          - xray:PutTraceSegments
-        Resource: 
-          - '*'
+      # - Effect: Allow
+      #   Action:
+      #     - xray:PutTraceSegments
+      #   Resource: 
+      #     - '*'
 
   # TODO: Configure this function
  
@@ -110,11 +116,11 @@ functions:
         Action:
           - dynamodb:PutItem
         Resource: arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.TODOS_TABLE}
-      - Effect: Allow
-        Action:
-          - xray:PutTraceSegments
-        Resource: 
-          - '*'
+      # - Effect: Allow
+      #   Action:
+      #     - xray:PutTraceSegments
+      #   Resource: 
+      #     - '*'
 
   # TODO: Configure this function
   UpdateTodo:
@@ -137,11 +143,11 @@ functions:
         Action:
           - dynamodb:UpdateItem
         Resource: arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.TODOS_TABLE}
-      - Effect: Allow
-        Action:
-          - xray:PutTraceSegments
-        Resource: 
-          - '*'
+      # - Effect: Allow
+      #   Action:
+      #     - xray:PutTraceSegments
+      #   Resource: 
+      #     - '*'
 
   # DELETE: Configure this function
   DeleteTodo:
@@ -158,11 +164,11 @@ functions:
         Action:
           - dynamodb:DeleteItem
         Resource: arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.TODOS_TABLE}
-      - Effect: Allow
-        Action:
-          - xray:PutTraceSegments
-        Resource: 
-          - '*'
+        # - Effect: Allow
+        # Action:
+        #   - xray:PutTraceSegments
+        # Resource: 
+        #   - '*'
 
   # POST: Configure this function
   GenerateUploadUrl:
@@ -178,7 +184,7 @@ functions:
       - Effect: Allow
         Action:
           - s3:*
-          - xray:PutTraceSegments 
+          # - xray:PutTraceSegments 
         Resource: arn:aws:s3:::${self:provider.environment.S3_BUCKET_NAME}/*
 
 resources:
